@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "Kelas": {
+      "title": "Kelas",
+      "description": "Unit tematik edukasi",
+      "type": "object",
+      "properties": {
+        "nama": { "type": "string" },
+        "slug": { "type": "string" },
+        "deskripsi": { "type": "string" },
+        "urutan": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nama", "slug"]
+    },
+    "Postingan": {
+      "title": "Postingan",
+      "description": "Artikel atau Kuis dalam sebuah kelas",
+      "type": "object",
+      "properties": {
+        "kelasId": { "type": "string" },
+        "tipe": { "type": "string", "enum": ["artikel", "kuis", "keduanya"] },
+        "judul": { "type": "string" },
+        "body": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "hasKuis": { "type": "boolean" },
+        "kuisId": { "type": "string" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["kelasId", "tipe", "judul"]
+    },
+    "PaketSoal": {
+      "title": "Paket Soal",
+      "description": "Konfigurasi kuis",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string" },
+        "kode": { "type": "string" },
+        "judul": { "type": "string" },
+        "durasi_menit": { "type": "number" },
+        "mode_scoring": { "type": "string", "enum": ["binary", "penalti", "skala", "irt"] },
+        "totalSoal": { "type": "number" }
+      },
+      "required": ["kode", "mode_scoring"]
+    },
+    "Soal": {
+      "title": "Soal",
+      "description": "Butir soal kuis",
+      "type": "object",
+      "properties": {
+        "paketId": { "type": "string" },
+        "urutan": { "type": "number" },
+        "konten_html": { "type": "string" },
+        "tipe_konten": { "type": "string" },
+        "opsi": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "teks": { "type": "string" },
+              "skor": { "type": "number" }
+            }
+          }
+        },
+        "kunci_jawaban": { "type": "string" },
+        "pembahasan": { "type": "string" },
+        "params_irt": {
+          "type": "object",
+          "properties": {
+            "a": { "type": "number" },
+            "b": { "type": "number" },
+            "c": { "type": "number" }
+          }
+        }
+      },
+      "required": ["paketId", "konten_html", "opsi"]
+    },
+    "HasilPeserta": {
+      "title": "Hasil Peserta",
+      "description": "Rekaman hasil ujian peserta",
+      "type": "object",
+      "properties": {
+        "paketId": { "type": "string" },
+        "kode": { "type": "string" },
+        "nama_peserta": { "type": "string" },
+        "jawaban_map": { "type": "object" },
+        "skor_raw": { "type": "number" },
+        "skor_irt": { "type": "number" },
+        "durasi_selesai": { "type": "number" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["paketId", "nama_peserta", "submittedAt"]
+    }
+  },
+  "firestore": {
+    "/kelas/{kelasId}": { "schema": "Kelas", "description": "Daftar kelas edukasi" },
+    "/postingan/{postId}": { "schema": "Postingan", "description": "Artikel dan kuis" },
+    "/paket_soal/{paketId}": { "schema": "PaketSoal", "description": "Konfigurasi paket soal" },
+    "/soal/{soalId}": { "schema": "Soal", "description": "Butir soal" },
+    "/hasil_peserta/{hasilId}": { "schema": "HasilPeserta", "description": "Hasil ujian peserta" }
+  }
+}
