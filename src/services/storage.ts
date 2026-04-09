@@ -1,128 +1,99 @@
 import { Program, Kelas, Subkelas, Postingan, PaketSoal, Soal, HasilPeserta } from '../types';
 import { mockPrograms, mockKelas, mockSubkelas, mockPostingan, allPaketSoal, allSoalList } from './mockData';
 
-const KEYS = {
-  PROGRAM: 'program_data',
-  KELAS: 'kelas_data',
-  SUBKELAS: 'subkelas_data',
-  POSTINGAN: 'postingan_data',
-  PAKET_SOAL: 'paket_soal_data',
-  SOAL: 'soal_data',
-  HASIL: 'hasil_data',
-  IS_INITIALIZED: 'is_initialized',
-  DATA_VERSION: 'data_version'
-};
-
-const CURRENT_VERSION = '1.1'; // Increment this to force update mock data
+// In-memory store — works in all environments including GitHub Pages sandboxed iframes
+let _programs: Program[] = [];
+let _kelas: Kelas[] = [];
+let _subkelas: Subkelas[] = [];
+let _postingan: Postingan[] = [];
+let _paketSoal: PaketSoal[] = [];
+let _soal: Soal[] = [];
+let _hasil: HasilPeserta[] = [];
+let _initialized = false;
 
 export const StorageService = {
   init: () => {
-    const savedVersion = localStorage.getItem(KEYS.DATA_VERSION);
-    if (!localStorage.getItem(KEYS.IS_INITIALIZED) || savedVersion !== CURRENT_VERSION) {
-      localStorage.setItem(KEYS.PROGRAM, JSON.stringify(mockPrograms));
-      localStorage.setItem(KEYS.KELAS, JSON.stringify(mockKelas));
-      localStorage.setItem(KEYS.SUBKELAS, JSON.stringify(mockSubkelas));
-      
-      // Only overwrite postingan/kuis if first time or explicitly needed
-      // For now, let's keep existing user posts but update hierarchy
-      if (!localStorage.getItem(KEYS.IS_INITIALIZED)) {
-        localStorage.setItem(KEYS.POSTINGAN, JSON.stringify(mockPostingan));
-        localStorage.setItem(KEYS.PAKET_SOAL, JSON.stringify(allPaketSoal));
-        localStorage.setItem(KEYS.SOAL, JSON.stringify(allSoalList));
-        localStorage.setItem(KEYS.HASIL, JSON.stringify([]));
-      }
-      
-      localStorage.setItem(KEYS.IS_INITIALIZED, 'true');
-      localStorage.setItem(KEYS.DATA_VERSION, CURRENT_VERSION);
-    }
+    if (_initialized) return;
+    _programs = JSON.parse(JSON.stringify(mockPrograms));
+    _kelas = JSON.parse(JSON.stringify(mockKelas));
+    _subkelas = JSON.parse(JSON.stringify(mockSubkelas));
+    _postingan = JSON.parse(JSON.stringify(mockPostingan));
+    _paketSoal = JSON.parse(JSON.stringify(allPaketSoal));
+    _soal = JSON.parse(JSON.stringify(allSoalList));
+    _hasil = [];
+    _initialized = true;
   },
 
   // Program
-  getPrograms: (): Program[] => JSON.parse(localStorage.getItem(KEYS.PROGRAM) || '[]'),
+  getPrograms: (): Program[] => [..._programs],
   saveProgram: (data: Program) => {
-    const all = StorageService.getPrograms();
-    const index = all.findIndex(p => p.id === data.id);
-    if (index > -1) all[index] = data;
-    else all.push(data);
-    localStorage.setItem(KEYS.PROGRAM, JSON.stringify(all));
+    const index = _programs.findIndex(p => p.id === data.id);
+    if (index > -1) _programs[index] = data;
+    else _programs.push(data);
   },
   deleteProgram: (id: string) => {
-    const all = StorageService.getPrograms().filter(p => p.id !== id);
-    localStorage.setItem(KEYS.PROGRAM, JSON.stringify(all));
+    _programs = _programs.filter(p => p.id !== id);
   },
 
   // Kelas
-  getKelas: (): Kelas[] => JSON.parse(localStorage.getItem(KEYS.KELAS) || '[]'),
-  getKelasByProgram: (programId: string): Kelas[] => 
-    StorageService.getKelas().filter(k => k.programId === programId),
+  getKelas: (): Kelas[] => [..._kelas],
+  getKelasByProgram: (programId: string): Kelas[] =>
+    _kelas.filter(k => k.programId === programId),
   saveKelas: (data: Kelas) => {
-    const all = StorageService.getKelas();
-    const index = all.findIndex(k => k.id === data.id);
-    if (index > -1) all[index] = data;
-    else all.push(data);
-    localStorage.setItem(KEYS.KELAS, JSON.stringify(all));
+    const index = _kelas.findIndex(k => k.id === data.id);
+    if (index > -1) _kelas[index] = data;
+    else _kelas.push(data);
   },
 
   // Subkelas
-  getSubkelas: (): Subkelas[] => JSON.parse(localStorage.getItem(KEYS.SUBKELAS) || '[]'),
-  getSubkelasByKelas: (kelasId: string): Subkelas[] => 
-    StorageService.getSubkelas().filter(s => s.kelasId === kelasId),
+  getSubkelas: (): Subkelas[] => [..._subkelas],
+  getSubkelasByKelas: (kelasId: string): Subkelas[] =>
+    _subkelas.filter(s => s.kelasId === kelasId),
   saveSubkelas: (data: Subkelas) => {
-    const all = StorageService.getSubkelas();
-    const index = all.findIndex(s => s.id === data.id);
-    if (index > -1) all[index] = data;
-    else all.push(data);
-    localStorage.setItem(KEYS.SUBKELAS, JSON.stringify(all));
+    const index = _subkelas.findIndex(s => s.id === data.id);
+    if (index > -1) _subkelas[index] = data;
+    else _subkelas.push(data);
   },
 
   // Postingan
-  getPostingan: (): Postingan[] => JSON.parse(localStorage.getItem(KEYS.POSTINGAN) || '[]'),
-  getPostinganByKelas: (kelasId: string): Postingan[] => 
-    StorageService.getPostingan().filter(p => p.kelasId === kelasId),
-  getPostinganBySubkelas: (subkelasId: string): Postingan[] => 
-    StorageService.getPostingan().filter(p => p.subkelasId === subkelasId),
+  getPostingan: (): Postingan[] => [..._postingan],
+  getPostinganByKelas: (kelasId: string): Postingan[] =>
+    _postingan.filter(p => p.kelasId === kelasId),
+  getPostinganBySubkelas: (subkelasId: string): Postingan[] =>
+    _postingan.filter(p => p.subkelasId === subkelasId),
   savePostingan: (data: Postingan) => {
-    const all = StorageService.getPostingan();
-    const index = all.findIndex(p => p.id === data.id);
-    if (index > -1) all[index] = data;
-    else all.push(data);
-    localStorage.setItem(KEYS.POSTINGAN, JSON.stringify(all));
+    const index = _postingan.findIndex(p => p.id === data.id);
+    if (index > -1) _postingan[index] = data;
+    else _postingan.push(data);
   },
 
   // Paket Soal
-  getPaketSoal: (): PaketSoal[] => JSON.parse(localStorage.getItem(KEYS.PAKET_SOAL) || '[]'),
-  getPaketSoalById: (id: string): PaketSoal | undefined => 
-    StorageService.getPaketSoal().find(p => p.id === id),
+  getPaketSoal: (): PaketSoal[] => [..._paketSoal],
+  getPaketSoalById: (id: string): PaketSoal | undefined =>
+    _paketSoal.find(p => p.id === id),
   savePaketSoal: (data: PaketSoal) => {
-    const all = StorageService.getPaketSoal();
-    const index = all.findIndex(p => p.id === data.id);
-    if (index > -1) all[index] = data;
-    else all.push(data);
-    localStorage.setItem(KEYS.PAKET_SOAL, JSON.stringify(all));
+    const index = _paketSoal.findIndex(p => p.id === data.id);
+    if (index > -1) _paketSoal[index] = data;
+    else _paketSoal.push(data);
   },
 
   // Soal
-  getSoal: (): Soal[] => JSON.parse(localStorage.getItem(KEYS.SOAL) || '[]'),
-  getSoalByPaket: (paketId: string): Soal[] => 
-    StorageService.getSoal().filter(s => s.paketId === paketId),
+  getSoal: (): Soal[] => [..._soal],
+  getSoalByPaket: (paketId: string): Soal[] =>
+    _soal.filter(s => s.paketId === paketId),
   saveSoal: (data: Soal) => {
-    const all = StorageService.getSoal();
-    const index = all.findIndex(s => s.id === data.id);
-    if (index > -1) all[index] = data;
-    else all.push(data);
-    localStorage.setItem(KEYS.SOAL, JSON.stringify(all));
+    const index = _soal.findIndex(s => s.id === data.id);
+    if (index > -1) _soal[index] = data;
+    else _soal.push(data);
   },
   saveSoalList: (paketId: string, list: Soal[]) => {
-    const allOther = StorageService.getSoal().filter(s => s.paketId !== paketId);
-    const updated = [...allOther, ...list];
-    localStorage.setItem(KEYS.SOAL, JSON.stringify(updated));
+    _soal = _soal.filter(s => s.paketId !== paketId);
+    _soal = [..._soal, ...list];
   },
 
   // Hasil
-  getHasil: (): HasilPeserta[] => JSON.parse(localStorage.getItem(KEYS.HASIL) || '[]'),
+  getHasil: (): HasilPeserta[] => [..._hasil],
   saveHasil: (data: HasilPeserta) => {
-    const all = StorageService.getHasil();
-    all.push(data);
-    localStorage.setItem(KEYS.HASIL, JSON.stringify(all));
-  }
+    _hasil.push(data);
+  },
 };
