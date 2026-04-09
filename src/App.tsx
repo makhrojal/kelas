@@ -329,7 +329,7 @@ const QuizPage = () => {
 
 // --- Admin Panel ---
 const Admin = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('admin_session') === 'true');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -371,7 +371,7 @@ const Admin = () => {
     e.preventDefault();
     if (email === 'admin' && password === 'admin') {
       setIsLoggedIn(true);
-      localStorage.setItem('admin_session', 'true');
+      // removed localStorage usage;
       setError('');
     } else {
       setError('Username atau Password salah! (Gunakan admin/admin)');
@@ -380,7 +380,7 @@ const Admin = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem('admin_session');
+    // removed localStorage usage;
   };
 
   const handleSaveProgram = (e: React.FormEvent) => {
@@ -500,7 +500,7 @@ const Admin = () => {
   const deletePost = (id: string) => {
     if (window.confirm('Hapus postingan ini?')) {
       const all = StorageService.getPostingan().filter(p => p.id !== id);
-      localStorage.setItem('postingan_data', JSON.stringify(all));
+      // removed: use in-memory storage instead;
       setPosts(all);
     }
   };
@@ -508,7 +508,7 @@ const Admin = () => {
   const deleteQuiz = (id: string) => {
     if (window.confirm('Hapus kuis ini?')) {
       const all = StorageService.getPaketSoal().filter(q => q.id !== id);
-      localStorage.setItem('paket_soal_data', JSON.stringify(all));
+      // removed: use in-memory storage instead;
       setQuizzes(all);
     }
   };
