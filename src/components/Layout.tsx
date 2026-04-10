@@ -1,12 +1,20 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/src/lib/utils';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -36,6 +44,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   {item.name}
                 </Link>
               ))}
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-red-500 hover:opacity-70 transition-opacity"
+                >
+                  <LogOut size={14} />
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className={cn(
+                    "text-[13px] font-medium transition-all hover:opacity-100",
+                    location.pathname === '/login' ? "text-[var(--ink)] opacity-100" : "text-[var(--ink2)] opacity-60"
+                  )}
+                >
+                  Login
+                </Link>
+              )}
             </nav>
 
             {/* Mobile Menu Toggle */}
@@ -73,6 +100,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     {item.name}
                   </Link>
                 ))}
+                {user ? (
+                  <button
+                    onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                    className="flex items-center gap-2 text-lg font-medium text-red-500 opacity-80"
+                  >
+                    <LogOut size={16} /> Logout
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block text-lg font-medium text-[var(--accent)]"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
             </motion.div>
           )}

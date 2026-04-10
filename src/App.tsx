@@ -373,7 +373,6 @@ const Admin = () => {
     e.preventDefault();
     if (email === 'admin' && password === 'admin') {
       setIsLoggedIn(true);
-      // removed localStorage usage;
       setError('');
     } else {
       setError('Username atau Password salah! (Gunakan admin/admin)');
@@ -382,7 +381,6 @@ const Admin = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    // removed localStorage usage;
   };
 
   const handleSaveProgram = (e: React.FormEvent) => {
@@ -502,7 +500,6 @@ const Admin = () => {
   const deletePost = (id: string) => {
     if (window.confirm('Hapus postingan ini?')) {
       const all = StorageService.getPostingan().filter(p => p.id !== id);
-      // removed: use in-memory storage instead;
       setPosts(all);
     }
   };
@@ -510,7 +507,6 @@ const Admin = () => {
   const deleteQuiz = (id: string) => {
     if (window.confirm('Hapus kuis ini?')) {
       const all = StorageService.getPaketSoal().filter(q => q.id !== id);
-      // removed: use in-memory storage instead;
       setQuizzes(all);
     }
   };
@@ -959,13 +955,13 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-                      <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/users" element={<AdminDashboard />} />
           <Route path="/program/:programId" element={<ProgramDetail />} />
           <Route path="/kelas/:kelasId" element={<KelasView />} />
           <Route path="/artikel/:postId" element={<ArticlePage />} />
           <Route path="/kuis/:kuisId" element={<QuizPage />} />
-          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Layout>
     </Router>
