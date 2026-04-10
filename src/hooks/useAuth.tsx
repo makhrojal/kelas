@@ -15,6 +15,7 @@ interface AuthContextType {
   profile: Profile | null;
   isAdmin: boolean;
   isLoading: boolean;
+  profileReady: boolean;
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -27,33 +28,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // profileReady = true hanya setelah fetchProfile selesai (atau user = null)
+  const [profileReady, setProfileReady] = useState(false);
 
-  const fetchProfile = async (userId: string) => {
+  /**
+   * Fetch profile dari tabel `profiles`.
+   * Jika belum ada (user baru via Google OAuth), buat row otomatis dengan role='user'.
+   * Return setelah selesai agar caller bisa await sebelum setIsLoading(false).
+   */
+  const fetchProfile = async (authUser: User): Promise<void> => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', authUser.id)
         .maybeSingle();
-      if (!error && data) setProfile(data as Profile);
+
+      if (error) {
+        console.error('fetchProfile error:', error.message);
+        setProfile(null);
+        return;
+      }
+
+      if (data) {
+        setProfile(data as Profile);
+        return;
+      }
+
+      // Profil belum ada → buat row baru dengan role default 'user'
+      const newProfile: Profile = {
+        id: authUser.id,
+        email: authUser.email ?? '',
+        full_name: authUser.user_metadata?.full_name ?? null,
+        role: 'user',
+      };
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert(newProfile);
+
+      if (insertError) {
+        console.error('fetchProfile insert error:', insertError.message);
+        setProfile(null);
+      } else {
+        setProfile(newProfile);
+      }
     } catch (err) {
-      console.error('fetchProfile error:', err);
+      console.error('fetchProfile unexpected error:', err);
+      setProfile(null);
     }
   };
 
   useEffect(() => {
-    // Use onAuthStateChange as the single source of truth.
-    // INITIAL_SESSION event fires immediately with the current session (or null).
+    // onAuthStateChange sebagai single source of truth.
+    // INITIAL_SESSION event fires langsung dengan session saat ini (atau null).
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setIsLoading(false);
+
         if (session?.user) {
-          fetchProfile(session.user.id);
+          // Tunggu fetchProfile selesai SEBELUM clear isLoading
+          // agar ProtectedRoute tidak membaca isAdmin=false secara prematur
+          await fetchProfile(session.user);
         } else {
           setProfile(null);
         }
+
+        // Kedua flag diset di sini — setelah semua async selesai
+        setProfileReady(true);
+        setIsLoading(false);
       }
     );
 
@@ -78,13 +121,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    setProfile(null);
+    setProfileReady(false);
     await supabase.auth.signOut();
   };
 
   const isAdmin = profile?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, isAdmin, isLoading, signInWithEmail, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{
+      user,
+      session,
+      profile,
+      isAdmin,
+      isLoading,
+      profileReady,
+      signInWithEmail,
+      signInWithGoogle,
+      signOut,
+    }}>
       {children}
     </AuthContext.Provider>
   );
