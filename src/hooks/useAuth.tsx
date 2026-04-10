@@ -42,34 +42,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    let mounted = true;
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
+      // Set isLoading false immediately, fetch profile in background
+      setIsLoading(false);
       if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setIsLoading(false));
-      } else {
-        setIsLoading(false);
+        fetchProfile(session.user.id);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
+      setIsLoading(false);
       if (session?.user) {
-        try {
-          await fetchProfile(session.user.id);
-        } catch (err) {
-          console.error('onAuthStateChange fetchProfile error:', err);
-        } finally {
-          setIsLoading(false);
-        }
+        fetchProfile(session.user.id);
       } else {
         setProfile(null);
-        setIsLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signInWithEmail = async (email: string, password: string) => {
