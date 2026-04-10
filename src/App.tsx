@@ -13,6 +13,8 @@ import { Program, Kelas, Subkelas, Postingan, PaketSoal, Soal, HasilPeserta, Ops
 import { BookOpen, HelpCircle, ChevronRight, Trophy, Clock, Plus, Trash2, Edit, Save, X, FileText, CheckCircle, AlertCircle, LayoutDashboard, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
+import LoginPage from './components/LoginPage';
+import AdminDashboard from './components/AdminDashboard';
 
 // --- Home Page ---
 const Home = () => {
@@ -957,6 +959,8 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+                      <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/program/:programId" element={<ProgramDetail />} />
           <Route path="/kelas/:kelasId" element={<KelasView />} />
           <Route path="/artikel/:postId" element={<ArticlePage />} />
