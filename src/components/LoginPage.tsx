@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Mail, Lock, Chrome } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-  const { signInWithEmail, signInWithGoogle } = useAuth();
+  const { signInWithEmail, signInWithGoogle, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,16 +13,26 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'register'>('login');
 
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    const { error } = await signInWithEmail(email, password);
-    setIsLoading(false);
-    if (error) {
-      setError(error);
-    } else {
-      navigate('/');
+    try {
+      const { error } = await signInWithEmail(email, password);
+      if (error) {
+        setError(error);
+      } else {
+        navigate('/');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,37 +89,29 @@ const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-4 rounded-full bg-[var(--accent)] text-white font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="w-full py-4 rounded-full bg-[var(--accent)] text-white font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-opacity disabled:opacity-60"
           >
-            {isLoading ? 'Memproses...' : (mode === 'login' ? 'Masuk' : 'Daftar')}
+            {isLoading ? 'MEMPROSES...' : 'MASUK'}
           </button>
         </form>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[var(--border)]" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="px-3 bg-[var(--bg)] text-[var(--ink3)] font-medium">atau</span>
-          </div>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 h-px bg-[var(--border)]" />
+          <span className="text-[var(--ink3)] text-xs">atau</span>
+          <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
 
         <button
           onClick={handleGoogle}
-          className="w-full py-4 rounded-full border border-[var(--border)] font-bold text-sm uppercase tracking-widest hover:bg-[var(--bg2)] transition-colors flex items-center justify-center gap-3"
+          className="w-full py-4 rounded-full border border-[var(--border)] font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[var(--bg2)] transition-colors"
         >
           <Chrome size={16} />
-          Masuk dengan Google
+          MASUK DENGAN GOOGLE
         </button>
 
-        <p className="text-center text-sm text-[var(--ink3)] mt-8">
-          {mode === 'login' ? 'Belum punya akun?' : 'Sudah punya akun?'}{' '}
-          <button
-            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-            className="text-[var(--accent)] font-bold hover:opacity-70 transition-opacity"
-          >
-            {mode === 'login' ? 'Daftar' : 'Masuk'}
-          </button>
+        <p className="text-center text-sm text-[var(--ink3)] mt-6">
+          Belum punya akun?{' '}
+          <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="text-[var(--accent)] font-bold">Daftar</button>
         </p>
       </motion.div>
     </div>
