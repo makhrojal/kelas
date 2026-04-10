@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -11,8 +12,6 @@
   --radius-card: 12px;
   --shadow-card: 0 4px 24px rgba(0,0,0,0.04);
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   --ink: #1d1d1f;
@@ -53,4 +52,3 @@ body {
 .markdown-body ol { @apply list-decimal pl-6 mb-6 space-y-2 text-lg text-[var(--ink2)]; }
 .markdown-body blockquote { @apply border-l-2 border-[var(--accent)] pl-6 italic mb-6 text-[var(--ink2)]; }
 .markdown-body img { @apply rounded-2xl my-8 shadow-sm; }
-
