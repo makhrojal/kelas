@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route, useParams, Link, useNavigate, u
 import Layout from './components/Layout';
 import ArticleView from './components/ArticleView';
 import QuizEngine from './components/QuizEngine';
+import ProtectedRoute from './components/ProtectedRoute';
 import { StorageService } from './services/storage';
 import { Program, Kelas, Subkelas, Postingan, PaketSoal, Soal, HasilPeserta, Opsi } from './types';
 import { BookOpen, HelpCircle, ChevronRight, Trophy, Clock, Plus, Trash2, Edit, Save, X, FileText, CheckCircle, AlertCircle, LayoutDashboard, LogOut } from 'lucide-react';
@@ -15,6 +16,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
 import LoginPage from './components/LoginPage';
 import AdminDashboard from './components/AdminDashboard';
+import { useAuth } from './hooks/useAuth';
 
 // --- Home Page ---
 const Home = () => {
@@ -330,11 +332,10 @@ const QuizPage = () => {
 };
 
 // --- Admin Panel ---
+// Login ditangani oleh ProtectedRoute + Supabase auth.
+// Komponen ini hanya render jika user sudah login DAN isAdmin === true.
 const Admin = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const { signOut, user } = useAuth();
   const [activeTab, setActiveTab] = useState<'programs' | 'posts' | 'quizzes' | 'results'>('posts');
   
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -354,33 +355,19 @@ const Admin = () => {
   const [editingSoalList, setEditingSoalList] = useState<Soal[]>([]);
 
   const [results, setResults] = useState<HasilPeserta[]>([]);
-  
-  const location = useLocation();
-  const navigate = useNavigate();
 
+  // Load data saat komponen mount (user sudah pasti admin karena ProtectedRoute)
   useEffect(() => {
-    if (isLoggedIn) {
-      setPrograms(StorageService.getPrograms());
-      setPosts(StorageService.getPostingan());
-      setQuizzes(StorageService.getPaketSoal());
-      setResults(StorageService.getHasil());
-      setAllKelas(StorageService.getKelas());
-      setAllSubkelas(StorageService.getSubkelas());
-    }
-  }, [isLoggedIn]);
+    setPrograms(StorageService.getPrograms());
+    setPosts(StorageService.getPostingan());
+    setQuizzes(StorageService.getPaketSoal());
+    setResults(StorageService.getHasil());
+    setAllKelas(StorageService.getKelas());
+    setAllSubkelas(StorageService.getSubkelas());
+  }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email === 'admin' && password === 'admin') {
-      setIsLoggedIn(true);
-      setError('');
-    } else {
-      setError('Username atau Password salah! (Gunakan admin/admin)');
-    }
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await signOut();
   };
 
   const handleSaveProgram = (e: React.FormEvent) => {
@@ -511,65 +498,21 @@ const Admin = () => {
     }
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="max-w-sm mx-auto py-32">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-[var(--bg)] rounded-[40px] p-12 shadow-2xl border border-[var(--border)] space-y-10"
-        >
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Admin</h2>
-            <p className="text-sm text-[var(--ink3)] font-medium uppercase tracking-widest">Akses Terbatas</p>
-          </div>
-          <form className="space-y-6" onSubmit={handleLogin}>
-            {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold rounded-2xl flex items-center gap-2">
-                <AlertCircle size={14} />
-                {error}
-              </div>
-            )}
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--ink3)] ml-1">Username</label>
-              <input 
-                type="text" 
-                required 
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full px-6 py-4 rounded-2xl border border-[var(--border)] bg-[var(--bg2)] focus:border-[var(--accent)] outline-none transition-all font-medium" 
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--ink3)] ml-1">Password</label>
-              <input 
-                type="password" 
-                required 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full px-6 py-4 rounded-2xl border border-[var(--border)] bg-[var(--bg2)] focus:border-[var(--accent)] outline-none transition-all font-medium" 
-              />
-            </div>
-            <button type="submit" className="w-full bg-[var(--ink)] text-white py-4 rounded-full font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98]">
-              Sign In
-            </button>
-          </form>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-16">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div className="space-y-1">
           <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-          <button 
-            onClick={handleLogout}
-            className="text-[11px] font-bold uppercase tracking-widest text-red-500 hover:opacity-70 transition-opacity flex items-center gap-2"
-          >
-            <LogOut size={12} /> Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-medium text-[var(--ink3)]">{user?.email}</span>
+            <span className="text-[var(--ink3)] opacity-30">·</span>
+            <button 
+              onClick={handleLogout}
+              className="text-[11px] font-bold uppercase tracking-widest text-red-500 hover:opacity-70 transition-opacity flex items-center gap-1.5"
+            >
+              <LogOut size={12} /> Logout
+            </button>
+          </div>
         </div>
         <div className="flex p-1.5 bg-[var(--bg2)] rounded-full border border-[var(--border)]">
           {(['programs', 'posts', 'quizzes', 'results'] as const).map(tab => (
@@ -956,8 +899,22 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/users" element={<AdminDashboard />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requireAdmin>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/program/:programId" element={<ProgramDetail />} />
           <Route path="/kelas/:kelasId" element={<KelasView />} />
           <Route path="/artikel/:postId" element={<ArticlePage />} />
