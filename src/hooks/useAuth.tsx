@@ -42,33 +42,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    let mounted = true;
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      // Set isLoading false immediately, fetch profile in background
-      setIsLoading(false);
-      if (session?.user) {
-        fetchProfile(session.user.id);
+    // Use onAuthStateChange as the single source of truth.
+    // INITIAL_SESSION event fires immediately with the current session (or null).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
       }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (!mounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-    });
+    );
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
