@@ -28,15 +28,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // profileReady = true hanya setelah fetchProfile selesai (atau user = null)
   const [profileReady, setProfileReady] = useState(false);
 
-  /**
-   * Fetch profile dari tabel `profiles`.
-   * Jika belum ada (user baru via Google OAuth), buat row otomatis dengan role='user'.
-   * Return setelah selesai agar caller bisa await sebelum setIsLoading(false).
-   */
-  const fetchProfile = async (authUser: User): Promise<void> => {
+  const fetchProfile = async (authUser: User): Promise<Profile | null> => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -46,16 +40,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('fetchProfile error:', error.message);
-        setProfile(null);
-        return;
+        return null;
       }
 
-      if (data) {
-        setProfile(data as Profile);
-        return;
-      }
+      if (data) return data as Profile;
 
-      // Profil belum ada → buat row baru dengan role default 'user'
+      // Profil belum ada → auto-create dengan role='user'
       const newProfile: Profile = {
         id: authUser.id,
         email: authUser.email ?? '',
@@ -68,39 +58,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (insertError) {
         console.error('fetchProfile insert error:', insertError.message);
-        setProfile(null);
-      } else {
-        setProfile(newProfile);
+        return null;
       }
+      return newProfile;
     } catch (err) {
       console.error('fetchProfile unexpected error:', err);
-      setProfile(null);
+      return null;
     }
   };
 
   useEffect(() => {
-    // onAuthStateChange sebagai single source of truth.
-    // INITIAL_SESSION event fires langsung dengan session saat ini (atau null).
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    let isMounted = true;
 
-        if (session?.user) {
-          // Tunggu fetchProfile selesai SEBELUM clear isLoading
-          // agar ProtectedRoute tidak membaca isAdmin=false secara prematur
-          await fetchProfile(session.user);
-        } else {
-          setProfile(null);
-        }
+    // Step 1: getSession() saat mount — ini synchronous-safe dan bisa di-await
+    const initAuth = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
 
-        // Kedua flag diset di sini — setelah semua async selesai
+      if (!isMounted) return;
+
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+
+      if (currentSession?.user) {
+        const p = await fetchProfile(currentSession.user);
+        if (isMounted) setProfile(p);
+      }
+
+      if (isMounted) {
         setProfileReady(true);
         setIsLoading(false);
+      }
+    };
+
+    initAuth();
+
+    // Step 2: onAuthStateChange untuk handle login/logout SETELAH init
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, newSession) => {
+        if (!isMounted) return;
+
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+
+        if (newSession?.user) {
+          setProfileReady(false); // reset dulu agar ProtectedRoute spinner
+          const p = await fetchProfile(newSession.user);
+          if (isMounted) {
+            setProfile(p);
+            setProfileReady(true);
+          }
+        } else {
+          setProfile(null);
+          setProfileReady(true);
+        }
+
+        if (isMounted) setIsLoading(false);
       }
     );
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -123,6 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     setProfile(null);
     setProfileReady(false);
+    setIsLoading(true);
     await supabase.auth.signOut();
   };
 
