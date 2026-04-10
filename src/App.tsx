@@ -27,49 +27,369 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="space-y-24">
-      <section className="text-center max-w-2xl mx-auto pt-12">
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-8"
+    <div className="space-y-[80px] pb-20 pt-8 max-w-6xl mx-auto">
+      {/* --- HERO SECTION --- */}
+      <section 
+        className="relative overflow-hidden text-center mx-auto"
+        style={{ 
+          backgroundColor: 'var(--apple-bg)', 
+          borderRadius: '22px', 
+          padding: '52px 40px 44px',
+          animation: 'fadeUp 0.6s ease forwards'
+        }}
+      >
+        <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '260px', height: '260px', borderRadius: '50%', background: 'rgba(88,204,2,0.07)', pointerEvents: 'none', filter: 'blur(40px)' }}></div>
+        <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(28,176,246,0.06)', pointerEvents: 'none', filter: 'blur(40px)' }}></div>
+        
+        <div 
+          className="mx-auto mb-6 relative z-10 font-semibold"
+          style={{ 
+            display: 'inline-flex', backgroundColor: 'var(--apple-white)', borderRadius: '100px', 
+            padding: '5px 14px', fontSize: '12px', border: '1px solid rgba(88,204,2,0.3)', 
+            color: 'var(--duo-green-dark)' 
+          }}
         >
-          Belajar dengan <span className="text-[var(--accent)]">Kejelasan.</span>
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-xl text-[var(--ink2)] leading-relaxed opacity-60"
+          🎮 Platform Belajar Adaptif
+        </div>
+        
+        <h1 
+          className="relative z-10 font-extrabold tracking-tight"
+          style={{ fontSize: 'clamp(36px, 5vw, 56px)', letterSpacing: '-0.035em', lineHeight: 1.06, color: 'var(--apple-dark)', marginBottom: '24px' }}
         >
-          Platform edukasi minimalis untuk menunjang karier dan masa depan Anda.
-        </motion.p>
-      </section>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {programs.map((p, idx) => (
-          <motion.div
-            key={p.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + idx * 0.05 }}
+          Belajar. Main.<br/>
+          <span style={{ color: 'var(--duo-green)' }}>Naik Level.</span>
+        </h1>
+        
+        <p 
+          className="relative z-10 mx-auto"
+          style={{ fontSize: '15px', color: 'var(--apple-gray)', lineHeight: 1.65, maxWidth: '500px', marginBottom: '12px' }}
+        >
+          Satu platform untuk semua tujuan — masuk PTN, lolos CPNS, tembus Kedinasan, atau siap karier ASN.
+        </p>
+
+        <p 
+          className="relative z-10 mx-auto"
+          style={{ fontSize: '13px', color: 'var(--apple-light-gray)', marginBottom: '32px' }}
+        >
+          Materi & kuis interaktif. Langsung akses. Tidak perlu daftar.
+        </p>
+        
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mb-6">
+          <Link 
+            to="/" 
+            className="w-full sm:w-auto inline-flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all"
+            style={{ 
+              backgroundColor: 'var(--duo-green)', color: 'var(--apple-white)', borderRadius: '14px', 
+              padding: '15px 36px', fontSize: '16px', fontWeight: 700 
+            }}
           >
-            <Link 
-              to={`/program/${p.id}`}
-              className="group block bg-[var(--bg2)] rounded-[32px] p-10 hover:bg-[var(--bg3)] transition-all duration-500 h-full"
-            >
-              <div className="flex flex-col h-full">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-[var(--ink3)] mb-4">{p.nama}</h3>
-                <p className="text-2xl font-bold tracking-tight mb-8 flex-1">
-                  {p.deskripsi}
-                </p>
-                <div className="flex items-center text-[var(--accent)] font-bold text-sm">
-                  Mulai Belajar <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+            Akses Materi Gratis →
+          </Link>
+          <button 
+            className="w-full sm:w-auto inline-flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+            style={{ 
+              backgroundColor: 'var(--apple-white)', color: 'var(--apple-dark)', border: '1px solid #d1d1d6', 
+              borderRadius: '14px', padding: '15px 24px', fontSize: '15px', fontWeight: 600 
+            }}
+          >
+            Masukkan Kode Kuis
+          </button>
+        </div>
+
+        <p 
+          className="relative z-10 mx-auto"
+          style={{ fontSize: '12px', color: 'var(--apple-light-gray)' }}
+        >
+          Tidak perlu daftar akun. Langsung baca & mulai kuis.
+        </p>
+      </section>
+
+      {/* --- STATS BAR --- */}
+      <div 
+        className="grid grid-cols-2 sm:grid-cols-4 gap-[10px]"
+        style={{ animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.1s', opacity: 0 }}
+      >
+        <div style={{ backgroundColor: 'white', border: '0.5px solid var(--apple-border)', borderRadius: '14px', padding: '14px', textAlign: 'center' }}>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--apple-dark)' }}>13</div>
+          <div style={{ fontSize: '11px', color: 'var(--apple-light-gray)' }}>Program Tersedia</div>
+        </div>
+        <div style={{ backgroundColor: 'white', border: '0.5px solid var(--apple-border)', borderRadius: '14px', padding: '14px', textAlign: 'center' }}>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--duo-green)' }}>40+</div>
+          <div style={{ fontSize: '11px', color: 'var(--apple-light-gray)' }}>Subkelas</div>
+        </div>
+        <div style={{ backgroundColor: 'white', border: '0.5px solid var(--apple-border)', borderRadius: '14px', padding: '14px', textAlign: 'center' }}>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--duo-blue)' }}>IRT</div>
+          <div style={{ fontSize: '11px', color: 'var(--apple-light-gray)' }}>Scoring Canggih</div>
+        </div>
+        <div style={{ backgroundColor: 'white', border: '0.5px solid var(--apple-border)', borderRadius: '14px', padding: '14px', textAlign: 'center' }}>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--duo-orange)' }}>0Rp</div>
+          <div style={{ fontSize: '11px', color: 'var(--apple-light-gray)' }}>Biaya Akses</div>
+        </div>
+      </div>
+
+      {/* --- PROGRAM SECTION HEADER --- */}
+      <div className="text-center" style={{ animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.15s', opacity: 0 }}>
+        <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--apple-gray)', marginBottom: '8px' }}>Semua Program</div>
+        <h2 style={{ fontSize: 'clamp(28px, 4vw, 32px)', fontWeight: 800, letterSpacing: '-0.025em', color: 'var(--apple-dark)', marginBottom: '12px' }}>
+          Satu platform. Semua jalur seleksi.
+        </h2>
+        <p style={{ fontSize: '15px', color: 'var(--apple-gray)', maxWidth: '600px', margin: '0 auto', lineHeight: 1.65 }}>
+          PTN · TKA · PKN STAN · Kedinasan · AKPOL · AKMIL · UNHAN · CPNS · TOEFL · Psikotes · Wawancara · Kebugaran · ASN
+        </p>
+      </div>
+
+      {/* --- FEATURED CARD: PTN & TKA --- */}
+      <div 
+        style={{ 
+          background: 'linear-gradient(135deg, #f0fff4, #e8f5ff)', borderRadius: '18px', padding: '22px', 
+          border: '1px solid rgba(88,204,2,0.2)', animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.2s', opacity: 0
+        }}
+      >
+        <div style={{ background: 'var(--duo-green)', color: 'white', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '100px', display: 'inline-block', marginBottom: '16px' }}>PALING POPULER</div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
+          {/* UTBK PTN */}
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '18px', border: '0.5px solid var(--apple-border)', display: 'flex', flexDirection: 'column' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: '#e8f5e0', borderRadius: '11px' }}>🎓</div>
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--apple-dark)' }}>UTBK PTN</div>
+                <div style={{ fontSize: '11px', color: 'var(--apple-light-gray)' }}>SNBT 2027</div>
+              </div>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--apple-gray)', marginBottom: '6px' }}>TPS — Tes Potensi Skolastik</div>
+                <div className="flex flex-wrap gap-1.5">
+                  <span style={{ fontSize: '11px', background: '#e8f5e0', color: '#3a9900', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🧠 Penalaran Umum</span>
+                  <span style={{ fontSize: '11px', background: '#e8f5e0', color: '#3a9900', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>📊 Peng. Kuantitatif</span>
+                  <span style={{ fontSize: '11px', background: '#e8f5e0', color: '#3a9900', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>📖 PPU</span>
+                  <span style={{ fontSize: '11px', background: '#e8f5e0', color: '#3a9900', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>💡 KMBM</span>
                 </div>
               </div>
-            </Link>
-          </motion.div>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--apple-gray)', marginBottom: '6px' }}>Literasi & Penalaran</div>
+                <div className="flex flex-wrap gap-1.5">
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>📝 Lit. Bahasa Indonesia</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🌐 Lit. Bahasa Inggris</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🔢 Pen. Matematika</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-auto">
+              <div style={{ background: '#f5f5f7', borderRadius: '100px', height: '5px', marginBottom: '8px', overflow: 'hidden' }}>
+                <div style={{ width: '45%', height: '100%', background: 'var(--duo-green)', borderRadius: '100px' }}></div>
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--apple-gray)', fontWeight: 500 }}>
+                45% materi tersedia · <span style={{ color: 'var(--duo-green)', fontWeight: 600, cursor: 'pointer' }}>Akses sekarang</span>
+              </div>
+            </div>
+          </div>
+
+          {/* TKA */}
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '18px', border: '0.5px solid var(--apple-border)', display: 'flex', flexDirection: 'column' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: 'var(--duo-blue-soft)', borderRadius: '11px' }}>📚</div>
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--apple-dark)' }}>TKA</div>
+                <div style={{ fontSize: '11px', color: 'var(--apple-light-gray)' }}>Tes Kemampuan Akademik</div>
+              </div>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--apple-gray)', marginBottom: '6px' }}>Saintek</div>
+                <div className="flex flex-wrap gap-1.5">
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>➕ Matematika</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🔬 Fisika</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>⚗️ Kimia</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🧬 Biologi</span>
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--apple-gray)', marginBottom: '6px' }}>Soshum</div>
+                <div className="flex flex-wrap gap-1.5">
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>📜 Sejarah</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🌏 Geografi</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>💰 Ekonomi</span>
+                  <span style={{ fontSize: '11px', background: '#f5f5f7', color: '#6e6e73', padding: '3px 8px', borderRadius: '6px', fontWeight: 500 }}>🤝 Sosiologi</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-auto">
+              <div style={{ background: '#f5f5f7', borderRadius: '100px', height: '5px', marginBottom: '8px', overflow: 'hidden' }}>
+                <div style={{ width: '15%', height: '100%', background: 'var(--duo-blue)', borderRadius: '100px' }}></div>
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--apple-gray)', fontWeight: 500 }}>
+                15% materi tersedia
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- FEATURED CARD: KEDINASAN --- */}
+      <div 
+        style={{ 
+          background: '#fdf6ff', borderRadius: '18px', padding: '22px', 
+          border: '1px solid rgba(134,65,244,0.15)', animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.25s', opacity: 0
+        }}
+      >
+        <div style={{ background: 'var(--duo-purple)', color: 'white', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '100px', display: 'inline-block', marginBottom: '16px' }}>KEDINASAN</div>
+        
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-[8px]">
+          {[
+            { icon: '👮', name: 'AKPOL', sub: 'SKD · SKB · MCU' },
+            { icon: '⚔️', name: 'AKMIL', sub: 'SKD · SKB · MCU' },
+            { icon: '📐', name: 'PKN STAN', sub: 'TPA · TBI' },
+            { icon: '🏫', name: 'UNHAN', sub: 'TPA · MCU' },
+            { icon: '🏛️', name: 'CPNS', sub: 'TWK · TIU · TKP' }
+          ].map((item, idx) => (
+            <div key={idx} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '14px', textAlign: 'center', border: '0.5px solid var(--apple-border)' }}>
+              <div style={{ fontSize: '20px', marginBottom: '6px' }}>{item.icon}</div>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--apple-dark)' }}>{item.name}</div>
+              <div style={{ fontSize: '10px', color: 'var(--apple-light-gray)' }}>{item.sub}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* --- PROGRAM GRID (6 smaller cards, 3 columns) --- */}
+      <div 
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[10px]"
+        style={{ animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.3s', opacity: 0 }}
+      >
+        {[
+          { icon: '🌐', title: 'TOEFL', chips: 'Listening · Structure · Reading', prog: 20, color: 'var(--duo-blue)' },
+          { icon: '🧩', title: 'Psikotes', chips: 'Logika · Kepribadian · Wartegg · Pauli', prog: 40, color: '#ce82ff' },
+          { icon: '🎤', title: 'Wawancara', chips: 'Personal Intro · Behavioral · Body Language', prog: 60, color: 'var(--duo-orange)' },
+          { icon: '🏥', title: 'Medical Check-Up', chips: 'Fisik · Lab · Jantung · Mata & Indra', prog: 10, color: 'var(--duo-red)' },
+          { icon: '🏃', title: 'Kebugaran', chips: 'Cooper · Shuttle Run · Push Up · Sit Up', prog: 50, color: 'var(--duo-green)' }
+        ].map((item, idx) => (
+          <div key={idx} className="cursor-pointer transition-all hover:-translate-y-[2px]" style={{ backgroundColor: 'white', borderRadius: '16px', padding: '18px', border: '0.5px solid var(--apple-border)', boxShadow: '0 4px 12px rgba(0,0,0,0)' }} onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'} onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0)'}>
+            <div className="flex items-center gap-3 mb-4">
+              <div style={{ fontSize: '24px' }}>{item.icon}</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--apple-dark)' }}>{item.title}</div>
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--apple-gray)', marginBottom: '16px', minHeight: '36px' }}>{item.chips}</div>
+            <div style={{ background: '#f5f5f7', borderRadius: '100px', height: '4px', overflow: 'hidden' }}>
+              <div style={{ width: `${item.prog}%`, height: '100%', background: item.color, borderRadius: '100px' }}></div>
+            </div>
+          </div>
         ))}
+
+        {/* Karier ASN Specific Card */}
+        <div className="cursor-pointer transition-all hover:-translate-y-[2px]" style={{ backgroundColor: 'var(--duo-purple-soft)', borderRadius: '16px', padding: '18px', border: '1px solid rgba(134,65,244,0.15)', boxShadow: '0 4px 12px rgba(0,0,0,0)' }} onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'} onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0)'}>
+          <div className="flex items-center gap-3 mb-4">
+            <div style={{ fontSize: '24px' }}>📊</div>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--apple-dark)' }}>Karier ASN</div>
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--apple-gray)', marginBottom: '16px', minHeight: '36px' }}>SAKIP · SPIP · MR · UKI</div>
+          <div style={{ background: '#f5f5f7', borderRadius: '100px', height: '4px', overflow: 'hidden' }}>
+            <div style={{ width: `30%`, height: '100%', background: 'var(--duo-purple)', borderRadius: '100px' }}></div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- EXISTING CARDS (KEPT ALIVE) --- */}
+      {programs.length > 0 && (
+        <div className="mt-12" style={{ animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.35s', opacity: 0 }}>
+          <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--apple-gray)', marginBottom: '16px', textAlign: 'center' }}>Program Lainnya</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[10px]">
+            {programs.map((p, idx) => (
+              <Link 
+                to={`/program/${p.id}`}
+                key={p.id}
+                className="cursor-pointer transition-all hover:-translate-y-[2px]" 
+                style={{ backgroundColor: 'white', borderRadius: '16px', padding: '22px', border: '0.5px solid var(--apple-border)', display: 'block', boxShadow: '0 4px 12px rgba(0,0,0,0)' }} 
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'} 
+                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0)'}
+              >
+                <h3 style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--apple-gray)', marginBottom: '8px' }}>{p.nama}</h3>
+                <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--apple-dark)', marginBottom: '16px' }}>
+                  {p.deskripsi}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--duo-green)' }}>
+                  Akses Program <ChevronRight size={14} className="ml-1" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* --- KODE KUIS SECTION --- */}
+      <div 
+        style={{ 
+          backgroundColor: 'white', border: '0.5px solid var(--apple-border)', borderRadius: '20px', 
+          padding: '30px', textAlign: 'center', margin: '0 auto', maxWidth: '800px',
+          animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.4s', opacity: 0
+        }}
+      >
+        <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--duo-green)', marginBottom: '8px' }}>Sudah punya kode?</div>
+        <h3 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--apple-dark)', marginBottom: '12px' }}>Langsung mulai kuis.</h3>
+        <p style={{ fontSize: '15px', color: 'var(--apple-gray)', marginBottom: '24px' }}>
+          Masukkan kode dari instruktur — contoh: <code style={{ fontFamily: 'monospace', background: '#f5f5f7', padding: '2px 6px', borderRadius: '4px', fontSize: '13px' }}>SAKIP-2026</code>
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-3 max-w-[380px] mx-auto">
+          <input 
+            type="text" 
+            placeholder="Kode kuis…" 
+            style={{ 
+              flex: 1, padding: '12px 16px', border: '1px solid #d1d1d6', borderRadius: '12px', 
+              fontSize: '15px', fontFamily: 'monospace', textTransform: 'uppercase', outline: 'none' 
+            }} 
+          />
+          <button 
+            className="hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+            style={{ 
+              backgroundColor: 'var(--apple-dark)', color: 'white', border: 'none', borderRadius: '12px', 
+              padding: '12px 20px', fontSize: '14px', fontWeight: 700 
+            }}
+          >
+            Masuk →
+          </button>
+        </div>
+      </div>
+
+      {/* --- FINAL CTA SECTION --- */}
+      <div 
+        className="relative overflow-hidden"
+        style={{ 
+          backgroundColor: 'var(--apple-dark)', borderRadius: '20px', padding: '50px 40px', 
+          textAlign: 'center', animation: 'fadeUp 0.4s ease forwards', animationDelay: '0.45s', opacity: 0 
+        }}
+      >
+        <div style={{ position: 'absolute', top: 0, right: 0, width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(88,204,2,0.1)', pointerEvents: 'none', filter: 'blur(30px)' }}></div>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(28,176,246,0.08)', pointerEvents: 'none', filter: 'blur(30px)' }}></div>
+        
+        <div className="relative z-10">
+          <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--duo-green)', marginBottom: '12px' }}>Mulai sekarang.</div>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 32px)', fontWeight: 800, color: 'white', marginBottom: '12px' }}>Semua jalur seleksi. Satu platform. Gratis.</h2>
+          <p style={{ fontSize: '15px', color: 'var(--apple-light-gray)', marginBottom: '32px' }}>Materi langsung bisa diakses. Tidak perlu daftar akun dulu.</p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-[400px] mx-auto mb-6">
+            <Link 
+              to="/" 
+              className="w-full sm:flex-1 inline-flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all"
+              style={{ backgroundColor: 'var(--duo-green)', color: 'white', borderRadius: '14px', padding: '15px 24px', fontSize: '15px', fontWeight: 700 }}
+            >
+              Akses Materi Sekarang →
+            </Link>
+            <button 
+              className="w-full sm:flex-1 inline-flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+              style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '14px', padding: '15px 24px', fontSize: '15px', fontWeight: 600 }}
+            >
+              Daftar Akun
+            </button>
+          </div>
+          
+          <p style={{ fontSize: '12px', color: '#6e6e73' }}>Daftar akun untuk simpan progress & lihat riwayat skor.</p>
+        </div>
       </div>
     </div>
   );
